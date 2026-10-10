@@ -93,13 +93,30 @@ while (count > 0) {
 }
 ```
 
-### 4.4 Resource Management (`defer`)
+### 4.4 Pattern Matching (`match`)
+```verb
+match status_code {
+    200 => print("OK")
+    404 => print("Not Found")
+    _   => print("Unknown")
+}
+```
+
+### 4.5 Resource Management (`defer`)
 Statements enclosed in `defer { ... }` execute in reverse order upon scope exit, guaranteeing deterministic cleanup.
 ```verb
 let ptr = alloc(1024);
 defer {
     free(ptr);
 }
+```
+
+### 4.6 Reactive State Signals (`create_signal`)
+First-class reactivity for tracking state mutations and notifying subscriber callbacks:
+```verb
+let count = create_signal(0);
+count["subscribe"]((val) => print("Count updated:", val));
+count["set"](1); # Invokes listener automatically
 ```
 
 ---

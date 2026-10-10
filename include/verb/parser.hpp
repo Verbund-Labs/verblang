@@ -33,6 +33,7 @@ private:
     std::shared_ptr<WhileStmt> parse_while();
     std::shared_ptr<ForInStmt> parse_for_in();
     std::shared_ptr<DeferStmt> parse_defer();
+    std::shared_ptr<MatchStmt> parse_match();
     std::shared_ptr<NativeCxxStmt> parse_native_cxx();
     std::shared_ptr<StyleDeclStmt> parse_style_decl();
     std::shared_ptr<BlockStmt> parse_block();

@@ -1,0 +1,158 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "VerbLang",
+  "scopeName": "source.verb",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#keywords" },
+    { "include": "#html-tags" },
+    { "include": "#css-rules" },
+    { "include": "#native-cxx" },
+    { "include": "#builtins" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.verb",
+          "match": "#.*$"
+        },
+        {
+          "name": "comment.line.double-slash.verb",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.verb",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.verb",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [{ "name": "constant.character.escape.verb", "match": "\\\\." }]
+        },
+        {
+          "name": "string.quoted.single.verb",
+          "begin": "'",
+          "end": "'",
+          "patterns": [{ "name": "constant.character.escape.verb", "match": "\\\\." }]
+        },
+        {
+          "name": "string.interpolated.template.verb",
+          "begin": "`",
+          "end": "`",
+          "patterns": [
+            {
+              "name": "meta.embedded.line.verb",
+              "begin": "\\$\\{",
+              "end": "\\}",
+              "beginCaptures": { "0": { "name": "punctuation.definition.template-expression.begin.verb" } },
+              "endCaptures": { "0": { "name": "punctuation.definition.template-expression.end.verb" } },
+              "patterns": [{ "include": "$self" }]
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.verb",
+          "match": "\\b0[xX][0-9a-fA-F]+\\b"
+        },
+        {
+          "name": "constant.numeric.decimal.verb",
+          "match": "\\b[0-9]+(\\.[0-9]+)?\\b"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.verb",
+          "match": "\\b(if|elif|else|while|for|in|return|match|defer|async|await)\\b"
+        },
+        {
+          "name": "keyword.declaration.verb",
+          "match": "\\b(let|const|fn|def|style|native|cxx)\\b"
+        },
+        {
+          "name": "constant.language.verb",
+          "match": "\\b(true|false|nil|null)\\b"
+        },
+        {
+          "name": "keyword.operator.logical.verb",
+          "match": "\\b(and|or|not)\\b"
+        }
+      ]
+    },
+    "html-tags": {
+      "patterns": [
+        {
+          "name": "meta.tag.verb",
+          "begin": "(</?)([a-zA-Z0-9_-]+)",
+          "beginCaptures": {
+            "1": { "name": "punctuation.definition.tag.begin.verb" },
+            "2": { "name": "entity.name.tag.verb" }
+          },
+          "end": "(/?>)",
+          "endCaptures": {
+            "1": { "name": "punctuation.definition.tag.end.verb" }
+          },
+          "patterns": [
+            { "include": "#strings" },
+            {
+              "name": "entity.other.attribute-name.verb",
+              "match": "\\b[a-zA-Z0-9_-]+\\b(?=\\=)"
+            }
+          ]
+        }
+      ]
+    },
+    "css-rules": {
+      "patterns": [
+        {
+          "name": "meta.style.verb",
+          "match": "\\bstyle\\s+([.#]?[a-zA-Z0-9_-]+)",
+          "captures": {
+            "1": { "name": "entity.other.attribute-name.class.css" }
+          }
+        }
+      ]
+    },
+    "native-cxx": {
+      "patterns": [
+        {
+          "name": "meta.embedded.cxx.verb",
+          "begin": "\\bnative\\s+cxx\\s*\\{",
+          "end": "\\}",
+          "patterns": [{ "name": "source.cpp", "match": ".*" }]
+        }
+      ]
+    },
+    "builtins": {
+      "patterns": [
+        {
+          "name": "support.function.builtin.verb",
+          "match": "\\b(print|len|range|type|now_ns|now_ms|sleep|read_file|write_file|alloc|free|peek64|poke64|sqrt|pow|sin|cos|render_html|render_tui|json_stringify|json_parse|str_upper|str_lower|str_split|str_join|str_trim|str_contains|list_push|list_pop|list_reverse|list_sort|create_signal)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.verb",
+          "match": "(=>|==|!=|<=|>=|<|>|\\+=|-=|\\+|-|\\*|/|%|=|&&|\\|\\||!|\\?\\.|\\?\\?)"
+        }
+      ]
+    }
+  }
+}

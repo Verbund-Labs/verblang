@@ -145,4 +145,57 @@ print(`Completed in ${elapsed_ms} ms!`);
 ```
 
 ---
+
+## 🎯 Pattern Matching (`match`)
+
+```verb
+match response_code {
+    200 => print("OK")
+    404 => print("Not Found")
+    500 => print("Internal Error")
+    _   => print("Unknown Status")
+}
+```
+
+---
+
+## 📦 JSON & Standard Library
+
+```verb
+# JSON serialization & parsing
+let payload = { "user": "VerbDev", "active": true };
+let json_str = json_stringify(payload);
+let restored = json_parse(json_str);
+
+# String utilities
+let clean = str_trim("  hello verb  ");
+let upper = str_upper(clean);
+let parts = str_split(clean, " ");
+let joined = str_join(parts, "-");
+
+# Reactive state signals
+let count = create_signal(0);
+count["subscribe"]((new_val) => print("Counter:", new_val));
+count["set"](10); # Triggers subscriber
+```
+
+---
+
+## 🛠️ CLI Project Workflow
+
+```bash
+# Initialize a new project
+verbc new my_project
+
+# Run project entry point
+verbc run my_project/src/main.verb
+
+# Format code automatically
+verbc fmt my_project/src/main.verb
+
+# Compile to optimized native binary
+verbc compile my_project/src/main.verb -o my_app
+```
+
+---
 © 2026 Verbund Labs.

@@ -44,6 +44,7 @@ enum class TokenType {
     And,
     Or,
     Not,
+    Match,
 
     // Operators
     Plus,       // +

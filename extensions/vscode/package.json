@@ -1,0 +1,35 @@
+{
+  "name": "verblang-support",
+  "displayName": "VerbLang Support",
+  "description": "Rich syntax highlighting and language support for VerbLang (.verb files), developed by Verbund Labs.",
+  "version": "1.0.0",
+  "publisher": "Verbund-Labs",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "verblang",
+        "aliases": [
+          "VerbLang",
+          "verb"
+        ],
+        "extensions": [
+          ".verb"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "verblang",
+        "scopeName": "source.verb",
+        "path": "./syntaxes/verblang.tmLanguage.json"
+      }
+    ]
+  }
+}

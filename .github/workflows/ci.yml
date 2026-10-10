@@ -1,0 +1,54 @@
+name: VerbLang Compiler CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build & Test (${{ matrix.os }}, ${{ matrix.cxx }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        cxx: [clang++, g++]
+
+    steps:
+      - name: Checkout Compiler repository
+        uses: actions/checkout@v4
+        with:
+          path: verblang
+
+      - name: Checkout Runtime repository
+        uses: actions/checkout@v4
+        with:
+          repository: Verbund-Labs/verb-runtime
+          path: verb-runtime
+
+      - name: Build Native Runtime
+        run: |
+          cd verb-runtime
+          make
+          make test
+
+      - name: Build VerbLang Compiler (verbc)
+        env:
+          CXX: ${{ matrix.cxx }}
+        run: |
+          cd verblang
+          make
+
+      - name: Run Complete VerbLang Test Suite
+        run: |
+          cd verblang
+          make test
+
+      - name: Test Project Scaffolding (verbc new)
+        run: |
+          cd verblang
+          ./bin/verbc new test_ci_project
+          ./bin/verbc run test_ci_project/src/main.verb
+          rm -rf test_ci_project

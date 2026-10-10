@@ -212,6 +212,17 @@ struct DeferStmt : public Stmt {
     void accept(ASTVisitor* visitor) override;
 };
 
+struct MatchCase {
+    std::shared_ptr<Expr> pattern; // nullptr indicates wildcard '_'
+    std::shared_ptr<Stmt> body;
+};
+
+struct MatchStmt : public Stmt {
+    std::shared_ptr<Expr> value;
+    std::vector<MatchCase> cases;
+    void accept(ASTVisitor* visitor) override;
+};
+
 struct NativeCxxStmt : public Stmt {
     std::string code;
     explicit NativeCxxStmt(std::string c) : code(std::move(c)) {}
@@ -262,6 +273,7 @@ public:
     virtual void visit(WhileStmt* node) = 0;
     virtual void visit(ForInStmt* node) = 0;
     virtual void visit(DeferStmt* node) = 0;
+    virtual void visit(MatchStmt* node) = 0;
     virtual void visit(NativeCxxStmt* node) = 0;
     virtual void visit(StyleDeclStmt* node) = 0;
     virtual void visit(Program* node) = 0;

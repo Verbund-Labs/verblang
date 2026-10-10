@@ -29,6 +29,8 @@ void print_help() {
     std::cout << "  run <file.verb>           Compile and run a .verb source file immediately\n";
     std::cout << "  compile <file.verb>       Compile a .verb source file to a standalone native binary\n";
     std::cout << "  emit-cxx <file.verb>      Transpile a .verb file to optimized C++20 code\n";
+    std::cout << "  new <project-name>        Initialize a new VerbLang project with manifest\n";
+    std::cout << "  fmt <file.verb>           Format and beautify a .verb source file\n";
     std::cout << "  repl                      Start an interactive VerbLang REPL session\n";
     std::cout << "  version                   Display VerbLang version and system information\n";
     std::cout << "  help                      Display this help information\n\n";
@@ -209,6 +211,93 @@ void cmd_repl() {
     }
 }
 
+int cmd_new(const std::string& project_name) {
+    if (project_name.empty()) {
+        std::cerr << "Usage: verbc new <project-name>\n";
+        return 1;
+    }
+    fs::path root(project_name);
+    if (fs::exists(root)) {
+        std::cerr << "Error: Directory '" << project_name << "' already exists!\n";
+        return 1;
+    }
+    fs::create_directories(root / "src");
+    fs::create_directories(root / "tests");
+
+    std::ofstream manifest(root / "verb.json");
+    manifest << "{\n"
+             << "  \"name\": \"" << project_name << "\",\n"
+             << "  \"version\": \"0.1.0\",\n"
+             << "  \"author\": \"Verbund Labs\",\n"
+             << "  \"entry\": \"src/main.verb\",\n"
+             << "  \"license\": \"Apache-2.0\"\n"
+             << "}\n";
+    manifest.close();
+
+    std::ofstream main_file(root / "src" / "main.verb");
+    main_file << "# ==========================================\n"
+              << "# " << project_name << " - Powered by VerbLang\n"
+              << "# Developed by Verbund Labs\n"
+              << "# ==========================================\n\n"
+              << "style .app {\n"
+              << "    color: \"cyan\";\n"
+              << "    border: \"1px solid #45475a\";\n"
+              << "}\n\n"
+              << "let view = <div class=\"app\">\n"
+              << "    <h1>`Welcome to " << project_name << "`</h1>\n"
+              << "    <p>\"Fusing C++ speed with Python, JS, HTML & CSS ease.\"</p>\n"
+              << "</div>;\n\n"
+              << "print(render_tui(view));\n"
+              << "print(\"✓ Native VerbLang project initialized successfully!\");\n";
+    main_file.close();
+
+    std::ofstream readme(root / "README.md");
+    readme << "# " << project_name << "\n\n"
+           << "A high-performance VerbLang project created with **Verbund Labs** toolchain.\n\n"
+           << "## Run\n"
+           << "```bash\n"
+           << "verbc run src/main.verb\n"
+           << "```\n";
+    readme.close();
+
+    std::cout << "\033[1;32m✓ Created new VerbLang project:\033[0m " << project_name << "\n";
+    std::cout << "  Entry point: \033[1;36m" << project_name << "/src/main.verb\033[0m\n";
+    std::cout << "  Run command: \033[1;33mverbc run " << project_name << "/src/main.verb\033[0m\n";
+    return 0;
+}
+
+int cmd_fmt(const std::string& file_path) {
+    std::string source = read_file(file_path);
+    std::istringstream stream(source);
+    std::string line;
+    std::stringstream formatted;
+    int indent = 0;
+
+    while (std::getline(stream, line)) {
+        size_t first = line.find_first_not_of(" \t");
+        if (first == std::string::npos) {
+            formatted << "\n";
+            continue;
+        }
+        std::string trimmed = line.substr(first);
+
+        if (!trimmed.empty() && (trimmed[0] == '}' || trimmed.substr(0, 2) == "</")) {
+            indent = std::max(0, indent - 1);
+        }
+
+        formatted << std::string(indent * 4, ' ') << trimmed << "\n";
+
+        if (!trimmed.empty() && trimmed.back() == '{') {
+            indent++;
+        }
+    }
+
+    std::ofstream out(file_path);
+    out << formatted.str();
+    std::cout << "\033[1;32m✓ Formatted:\033[0m " << file_path << "\n";
+    return 0;
+}
+
 int main(int argc, char** argv) {
     if (argc < 2) {
         print_help();
@@ -230,6 +319,22 @@ int main(int argc, char** argv) {
     if (command == "repl") {
         cmd_repl();
         return 0;
+    }
+
+    if (command == "new") {
+        if (argc < 3) {
+            std::cerr << "Usage: verbc new <project-name>\n";
+            return 1;
+        }
+        return cmd_new(argv[2]);
+    }
+
+    if (command == "fmt") {
+        if (argc < 3) {
+            std::cerr << "Usage: verbc fmt <file.verb>\n";
+            return 1;
+        }
+        return cmd_fmt(argv[2]);
     }
 
     if (command == "run") {

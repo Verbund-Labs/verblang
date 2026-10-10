@@ -6,7 +6,11 @@ namespace verb {
 static const std::unordered_set<std::string> BUILTINS = {
     "print", "len", "range", "type", "now_ns", "now_ms", "sleep",
     "read_file", "write_file", "alloc", "free", "peek64", "poke64",
-    "sqrt", "pow", "sin", "cos", "render_html", "render_tui"
+    "sqrt", "pow", "sin", "cos", "render_html", "render_tui",
+    "json_stringify", "json_parse",
+    "str_upper", "str_lower", "str_split", "str_join", "str_trim", "str_contains",
+    "list_push", "list_pop", "list_reverse", "list_sort",
+    "create_signal"
 };
 
 CxxCodeGen::CxxCodeGen() = default;
@@ -489,6 +493,55 @@ void CxxCodeGen::visit(DeferStmt* node) {
     indent_level_--;
     emit_indent();
     out_ << "});";
+}
+
+void CxxCodeGen::visit(MatchStmt* node) {
+    out_ << "{\n";
+    indent_level_++;
+    emit_indent();
+    out_ << "Value _match_val = ";
+    node->value->accept(this);
+    out_ << ";\n";
+
+    bool first = true;
+    for (const auto& c : node->cases) {
+        emit_indent();
+        if (c.pattern) {
+            if (first) {
+                out_ << "if ((_match_val == (";
+                c.pattern->accept(this);
+                out_ << ")).is_truthy()) ";
+            } else {
+                out_ << "else if ((_match_val == (";
+                c.pattern->accept(this);
+                out_ << ")).is_truthy()) ";
+            }
+        } else {
+            if (first) {
+                out_ << "if (true) ";
+            } else {
+                out_ << "else ";
+            }
+        }
+
+        if (auto block = dynamic_cast<BlockStmt*>(c.body.get())) {
+            block->accept(this);
+            out_ << "\n";
+        } else {
+            out_ << "{\n";
+            indent_level_++;
+            emit_indent();
+            c.body->accept(this);
+            out_ << "\n";
+            indent_level_--;
+            emit_indent();
+            out_ << "}\n";
+        }
+        first = false;
+    }
+    indent_level_--;
+    emit_indent();
+    out_ << "}";
 }
 
 void CxxCodeGen::visit(NativeCxxStmt* node) {

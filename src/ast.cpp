@@ -31,6 +31,7 @@ void IfStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
 void WhileStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
 void ForInStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
 void DeferStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
+void MatchStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
 void NativeCxxStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
 void StyleDeclStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
 void Program::accept(ASTVisitor* visitor) { visitor->visit(this); }

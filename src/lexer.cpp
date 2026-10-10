@@ -29,6 +29,7 @@ static const std::unordered_map<std::string, TokenType> KEYWORDS = {
     {"and", TokenType::And},
     {"or", TokenType::Or},
     {"not", TokenType::Not},
+    {"match", TokenType::Match},
 };
 
 Lexer::Lexer(std::string source) : source_(std::move(source)) {}

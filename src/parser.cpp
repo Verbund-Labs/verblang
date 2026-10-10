@@ -74,6 +74,7 @@ std::shared_ptr<Stmt> Parser::parse_statement() {
     if (match(TokenType::While)) return parse_while();
     if (match(TokenType::For)) return parse_for_in();
     if (match(TokenType::Defer)) return parse_defer();
+    if (match(TokenType::Match)) return parse_match();
     if (check(TokenType::RawCxxLit)) {
         Token tok = advance();
         return std::make_shared<NativeCxxStmt>(tok.text);
@@ -227,6 +228,40 @@ std::shared_ptr<DeferStmt> Parser::parse_defer() {
     auto defer_stmt = std::make_shared<DeferStmt>();
     defer_stmt->body = parse_block();
     return defer_stmt;
+}
+
+std::shared_ptr<MatchStmt> Parser::parse_match() {
+    auto match_stmt = std::make_shared<MatchStmt>();
+    bool has_paren = match(TokenType::LParen);
+    match_stmt->value = parse_expression();
+    if (has_paren) consume(TokenType::RParen, "Expected ')' after match expression");
+    match(TokenType::Colon);
+
+    consume(TokenType::LBrace, "Expected '{' to start match block");
+    while (!check(TokenType::RBrace) && !is_at_end()) {
+        skip_semicolons();
+        if (check(TokenType::RBrace) || is_at_end()) break;
+
+        MatchCase c;
+        if (check(TokenType::Ident) && peek().text == "_") {
+            advance(); // consume '_'
+            c.pattern = nullptr;
+        } else {
+            c.pattern = parse_expression();
+        }
+
+        consume(TokenType::Arrow, "Expected '=>' after match pattern");
+
+        if (check(TokenType::LBrace)) {
+            c.body = parse_block();
+        } else {
+            c.body = parse_statement();
+        }
+        match_stmt->cases.push_back(c);
+        skip_semicolons();
+    }
+    consume(TokenType::RBrace, "Expected '}' to end match block");
+    return match_stmt;
 }
 
 std::shared_ptr<StyleDeclStmt> Parser::parse_style_decl() {

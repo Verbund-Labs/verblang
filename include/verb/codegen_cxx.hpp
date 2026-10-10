@@ -41,6 +41,7 @@ public:
     void visit(WhileStmt* node) override;
     void visit(ForInStmt* node) override;
     void visit(DeferStmt* node) override;
+    void visit(MatchStmt* node) override;
     void visit(NativeCxxStmt* node) override;
     void visit(StyleDeclStmt* node) override;
     void visit(Program* node) override;

@@ -1,0 +1,80 @@
+# ==============================================================================
+# VerbLang - Pattern Matching, JSON, String Lib & Reactive Signals
+# Developed by Verbund Labs
+# ==============================================================================
+
+print("=== Advanced VerbLang Capabilities Showcase ===");
+
+# ------------------------------------------------------------------------------
+# 1. Pattern Matching (match statement)
+# ------------------------------------------------------------------------------
+print("\n--- 1. Pattern Matching (match statement) ---");
+
+fn evaluate_response(status_code) {
+    match status_code {
+        200 => print("HTTP 200: OK - Request processed at native speed")
+        404 => print("HTTP 404: Not Found - Resource does not exist")
+        500 => print("HTTP 500: Server Error - Internal fault")
+        _   => print(`Unknown Status Code: ${status_code}`)
+    }
+}
+
+evaluate_response(200);
+evaluate_response(404);
+evaluate_response(999);
+
+# ------------------------------------------------------------------------------
+# 2. JSON Serialization & Deserialization
+# ------------------------------------------------------------------------------
+print("\n--- 2. Built-in JSON Engine ---");
+
+let original_data = {
+    "engine": "VerbLang",
+    "version": 1,
+    "features": ["speed", "reactivity", "markup", "styles"]
+};
+
+let json_string = json_stringify(original_data);
+print("Serialized JSON string:", json_string);
+
+let parsed_data = json_parse(json_string);
+print("Parsed JSON object:", parsed_data);
+print("Parsed engine name:", parsed_data["engine"]);
+
+# ------------------------------------------------------------------------------
+# 3. String & List Standard Library
+# ------------------------------------------------------------------------------
+print("\n--- 3. String & List Utilities ---");
+
+let message = "   verb language is blazingly fast   ";
+let cleaned = str_trim(message);
+let uppercase = str_upper(cleaned);
+print("Trimmed & Uppercased:", uppercase);
+
+let words = str_split(cleaned, " ");
+print("Split into words list:", words);
+
+let rejoined = str_join(words, " -> ");
+print("Rejoined with delimiter:", rejoined);
+
+# ------------------------------------------------------------------------------
+# 4. Reactive State Signals (First-Class Reactivity)
+# ------------------------------------------------------------------------------
+print("\n--- 4. Reactive State Signals ---");
+
+let counter = create_signal(0);
+
+# Register subscriber callback
+counter["subscribe"]((new_val) => {
+    print(`  [Reactive Signal Listener] State updated to: ${new_val}`);
+});
+
+print("Initial Signal Value:", counter["get"]());
+
+print("Updating Signal to 10:");
+counter["set"](10);
+
+print("Updating Signal to 42:");
+counter["set"](42);
+
+print("✓ All advanced VerbLang systems operating at peak performance!\n");

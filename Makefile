@@ -28,6 +28,7 @@ test: all
 	./bin/verbc run examples/04_html_css_components.verb
 	./bin/verbc run examples/05_cpp_speed_pointers.verb
 	./bin/verbc run examples/06_full_stack_app.verb
+	./bin/verbc run examples/07_match_json_reactivity.verb
 
 clean:
 	rm -rf bin $(OBJS)
