@@ -34,6 +34,7 @@ void DeferStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
 void MatchStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
 void NativeCxxStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
 void StyleDeclStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
+void ImportStmt::accept(ASTVisitor* visitor) { visitor->visit(this); }
 void Program::accept(ASTVisitor* visitor) { visitor->visit(this); }
 
 } // namespace verb

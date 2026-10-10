@@ -10,9 +10,10 @@ namespace verb {
 
 class Parser {
 public:
-    explicit Parser(std::vector<Token> tokens);
+    explicit Parser(std::vector<Token> tokens, std::string source_file = "<input>", std::string source_code = "");
 
     std::shared_ptr<Program> parse_program();
+    std::string format_diagnostic(const std::string& err_msg, const SourceLocation& loc) const;
 
 private:
     const Token& peek(size_t offset = 0) const;
@@ -26,6 +27,7 @@ private:
 
     // Statements
     std::shared_ptr<Stmt> parse_statement();
+    std::shared_ptr<ImportStmt> parse_import();
     std::shared_ptr<VarDeclStmt> parse_var_decl(bool is_const);
     std::shared_ptr<FunctionDeclStmt> parse_function_decl(bool is_async);
     std::shared_ptr<ReturnStmt> parse_return();
@@ -58,6 +60,8 @@ private:
     std::shared_ptr<TemplateLiteralExpr> parse_template_literal(const std::string& raw);
 
     std::vector<Token> tokens_;
+    std::string source_file_ = "<input>";
+    std::string source_code_;
     size_t cursor_ = 0;
 };
 

@@ -1,0 +1,15 @@
+assert(str_upper("verb") == "VERB", "str_upper");
+assert(str_lower("VERB") == "verb", "str_lower");
+assert(str_starts_with("verblang", "verb"), "str_starts_with");
+assert(str_ends_with("main.verb", ".verb"), "str_ends_with");
+assert(str_replace("foo bar", "bar", "baz") == "foo baz", "str_replace");
+
+assert(abs(-99) == 99, "abs");
+assert(min(5, 2, 9) == 2, "min");
+assert(max(5, 2, 9) == 9, "max");
+
+let items = ["alpha", "beta", "gamma"];
+assert(list_contains(items, "beta"), "list_contains");
+
+env_set("VERB_TEST_VAR", "active");
+assert(env_get("VERB_TEST_VAR") == "active", "env_get");

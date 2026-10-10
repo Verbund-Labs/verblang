@@ -44,6 +44,7 @@ public:
     void visit(MatchStmt* node) override;
     void visit(NativeCxxStmt* node) override;
     void visit(StyleDeclStmt* node) override;
+    void visit(ImportStmt* node) override;
     void visit(Program* node) override;
 
 private:

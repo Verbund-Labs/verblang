@@ -1,10 +1,38 @@
 #include "verb/parser.hpp"
 #include "verb/lexer.hpp"
 #include <iostream>
+#include <sstream>
 
 namespace verb {
 
-Parser::Parser(std::vector<Token> tokens) : tokens_(std::move(tokens)) {}
+Parser::Parser(std::vector<Token> tokens, std::string source_file, std::string source_code)
+    : tokens_(std::move(tokens)), source_file_(std::move(source_file)), source_code_(std::move(source_code)) {}
+
+std::string Parser::format_diagnostic(const std::string& err_msg, const SourceLocation& loc) const {
+    std::stringstream ss;
+    ss << "\033[1;31merror:\033[0m " << err_msg << "\n";
+    ss << "  \033[1;34m-->\033[0m " << source_file_ << ":" << loc.line << ":" << loc.column << "\n";
+
+    if (!source_code_.empty()) {
+        std::istringstream stream(source_code_);
+        std::string line_str;
+        size_t current_line = 1;
+        while (std::getline(stream, line_str)) {
+            if (current_line == loc.line) {
+                ss << "   \033[1;34m|\033[0m\n";
+                ss << " " << loc.line << " \033[1;34m|\033[0m " << line_str << "\n";
+                ss << "   \033[1;34m|\033[0m ";
+                for (size_t i = 1; i < loc.column; ++i) {
+                    ss << (line_str[i - 1] == '\t' ? '\t' : ' ');
+                }
+                ss << "\033[1;31m^\033[0m\n";
+                break;
+            }
+            current_line++;
+        }
+    }
+    return ss.str();
+}
 
 const Token& Parser::peek(size_t offset) const {
     if (cursor_ + offset >= tokens_.size()) return tokens_.back();
@@ -40,9 +68,8 @@ bool Parser::match(TokenType type) {
 
 Token Parser::consume(TokenType type, const std::string& err_msg) {
     if (check(type)) return advance();
-    throw std::runtime_error("Parse error at line " + std::to_string(peek().loc.line) +
-                             ", col " + std::to_string(peek().loc.column) + ": " + err_msg +
-                             " (found '" + peek().text + "')");
+    std::string msg = format_diagnostic(err_msg + " (found '" + peek().text + "')", peek().loc);
+    throw std::runtime_error(msg);
 }
 
 void Parser::skip_semicolons() {
@@ -61,6 +88,7 @@ std::shared_ptr<Program> Parser::parse_program() {
 }
 
 std::shared_ptr<Stmt> Parser::parse_statement() {
+    if (match(TokenType::Import)) return parse_import();
     if (match(TokenType::Let)) return parse_var_decl(false);
     if (match(TokenType::Const)) return parse_var_decl(true);
     if (match(TokenType::Fn) || match(TokenType::Def)) return parse_function_decl(false);
@@ -98,6 +126,14 @@ std::shared_ptr<Stmt> Parser::parse_statement() {
 
     skip_semicolons();
     return std::make_shared<ExprStmt>(expr);
+}
+
+std::shared_ptr<ImportStmt> Parser::parse_import() {
+    Token path_tok = consume(TokenType::StringLit, "expected module or file path string after 'import'");
+    skip_semicolons();
+    auto stmt = std::make_shared<ImportStmt>(path_tok.text);
+    stmt->loc = path_tok.loc;
+    return stmt;
 }
 
 std::shared_ptr<VarDeclStmt> Parser::parse_var_decl(bool is_const) {
@@ -301,8 +337,7 @@ std::shared_ptr<StyleDeclStmt> Parser::parse_style_decl() {
                 }
             }
         } else {
-            throw std::runtime_error("Expected style property name at line " +
-                                     std::to_string(peek().loc.line));
+            throw std::runtime_error(format_diagnostic("expected style property name", peek().loc));
         }
         consume(TokenType::Colon, "Expected ':' after style property");
         auto val = parse_expression();
@@ -547,8 +582,7 @@ std::shared_ptr<Expr> Parser::parse_primary() {
         return expr;
     }
 
-    throw std::runtime_error("Unexpected token in expression at line " +
-                             std::to_string(peek().loc.line) + ": '" + peek().text + "'");
+    throw std::runtime_error(format_diagnostic("unexpected token in expression: '" + peek().text + "'", peek().loc));
 }
 
 std::shared_ptr<HtmlElementExpr> Parser::parse_html_element() {
@@ -648,7 +682,7 @@ std::shared_ptr<DictLiteralExpr> Parser::parse_dict_literal() {
         if (match(TokenType::StringLit) || match(TokenType::Ident)) {
             key = previous().text;
         } else {
-            throw std::runtime_error("Expected string or identifier key in dict literal");
+            throw std::runtime_error(format_diagnostic("expected string or identifier key in dictionary literal", peek().loc));
         }
         consume(TokenType::Colon, "Expected ':' after dict key");
         auto val = parse_expression();

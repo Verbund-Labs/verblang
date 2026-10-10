@@ -14,4 +14,4 @@ let welcome = greet(target);
 print(welcome);
 
 let author = "Verbund Labs";
-print(`Created with love and raw C++ power by ${author}!`);
+print(`VerbLang native runtime initialized by ${author}.`);

@@ -9,8 +9,10 @@ static const std::unordered_set<std::string> BUILTINS = {
     "sqrt", "pow", "sin", "cos", "render_html", "render_tui",
     "json_stringify", "json_parse",
     "str_upper", "str_lower", "str_split", "str_join", "str_trim", "str_contains",
-    "list_push", "list_pop", "list_reverse", "list_sort",
-    "create_signal"
+    "str_starts_with", "str_ends_with", "str_replace",
+    "list_push", "list_pop", "list_reverse", "list_sort", "list_contains", "list_slice",
+    "create_signal", "args", "env_get", "env_set", "file_exists", "file_remove", "exec",
+    "abs", "min", "max", "floor", "ceil", "round", "assert"
 };
 
 CxxCodeGen::CxxCodeGen() = default;
@@ -54,7 +56,7 @@ std::string CxxCodeGen::generate(Program* program) {
     out_ << "int main(int argc, char** argv) {\n";
     indent_level_++;
     emit_indent();
-    out_ << "verbrt::initialize();\n";
+    out_ << "verbrt::initialize(argc, argv);\n";
     emit_indent();
     out_ << "Value __args = Value::make_list();\n";
     emit_indent();
@@ -562,6 +564,11 @@ void CxxCodeGen::visit(StyleDeclStmt* node) {
     indent_level_--;
     emit_indent();
     out_ << "});";
+}
+
+void CxxCodeGen::visit(ImportStmt* node) {
+    emit_indent();
+    out_ << "// import \"" << node->path << "\";\n";
 }
 
 void CxxCodeGen::visit(Program*) {}

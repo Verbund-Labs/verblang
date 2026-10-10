@@ -1,0 +1,14 @@
+let square = x => x * x;
+assert(square(8) == 64, "square should work");
+
+let nums = [1, 2, 3, 4, 5];
+let doubled = [x * 2 for x in nums if x > 2];
+assert(len(doubled) == 3, "comprehension length should be 3");
+
+let status = 200;
+let ok = false;
+match status {
+    200 => { ok = true; }
+    _   => { ok = false; }
+}
+assert(ok == true, "pattern match must succeed");

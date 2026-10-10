@@ -2,141 +2,139 @@
 
 namespace verb {
 
-inline constexpr const char* AGENTS_GUIDE_TEMPLATE = R"AGENTS_GUIDE(# AGENTS.md — VerbLang Engineering Guide for AI Agents ⚡
-**Language:** VerbLang (`.verb` source files)  
-**Created By:** Verbund Labs  
-**Specification Version:** 1.0.0  
+inline constexpr const char* AGENTS_GUIDE_TEMPLATE = R"AGENTS_GUIDE(
+# AGENTS.md — VerbLang Technical Specification & Architecture Reference
+Language: VerbLang (`.verb` source files)
+Maintained by: Verbund Labs
+Specification: 1.0.0
 
-This guide provides complete technical rules, grammar patterns, standard library references, and best practices for AI coding assistants and autonomous agents modifying or generating VerbLang codebases.
-
----
-
-## 1. Architecture & Execution Model
-
-VerbLang code is compiled Ahead-Of-Time (AOT) to optimized modern **C++20** and linked against the high-performance native engine `libverbrt` developed by **Verbund Labs**.
-
-- **File Extension**: All VerbLang files must use `.verb`.
-- **Compiler Executable**: `verbc` (orchestrates lexing, parsing, C++20 emission, and Clang++/LLVM compilation).
-- **Core Runtime**: `verb-runtime` (`libverbrt`), providing unified variant values (`verbrt::Value`), virtual DOM trees, CSS selector resolvers, event loop, and memory allocators.
-- **Performance Characteristics**: Zero-overhead native execution, deterministic RAII cleanup, throughput exceeding 2.4 million operations per second on standard hardware.
+This specification document outlines the grammar, execution model, standard library, and module system for VerbLang.
 
 ---
 
-## 2. Syntax & Grammar Reference
+## 1. Execution Model & Architecture
 
-### 2.1 Variables & Constants
+VerbLang is compiled Ahead-Of-Time (AOT) to modern C++20 and linked against `libverbrt`, the native runtime engine developed by Verbund Labs.
+
+- Source Files: `.verb`
+- Toolchain: `verbc` (compiler, module resolver, C++20 transpiler, and runner)
+- Runtime: `libverbrt` (provides `verbrt::Value` variant, arena memory management, virtual DOM, CSS cascade engine, and asynchronous event loop)
+- Output: Standalone native ELF executable (or transpiled C++20 via `verbc emit-cxx`)
+- Target: x86_64 / arm64 Linux, macOS, BSD
+
+---
+
+## 2. Syntax & Grammar
+
+### 2.1 Declarations
 ```verb
-let mutable_val = 100;
-const immutable_val = 3.14159;
+let count = 42;
+const max_connections = 1024;
 
 # Optional type annotations
-let count: int = 42;
-let name: str = "Verbund";
+let port: int = 8080;
+let host: str = "127.0.0.1";
 ```
 
 ### 2.2 Comments
 ```verb
 # Python-style line comment
-// C++/JavaScript-style line comment
-/* Multi-line
-   block comment */
+// C++/JavaScript line comment
+/* Multi-line block comment */
 ```
 
 ### 2.3 Functions & Closures
 ```verb
-# Standard function definition (fn or def)
-fn add(a, b) {
-    return a + b;
+fn compute_checksum(data, seed) {
+    return data * 31 + seed;
 }
 
-def multiply(a, b): {
-    return a * b;
+# Pythonic syntax also accepted
+def calculate_ratio(a, b): {
+    return a / b;
 }
 
-# JavaScript-style arrow functions & lambdas
+# Arrow functions and expressions
 let square = x => x * x;
-let compute = (a, b) => a * b + 10;
+let add = (a, b) => a + b;
 
-# Lexical closures
-fn make_counter(start) {
+# Closures
+fn create_accumulator(start) {
     let current = start;
-    return () => {
-        current += 1;
+    return (delta) => {
+        current += delta;
         return current;
     };
 }
 
 # Asynchronous functions
 async fn fetch_telemetry(channel) {
-    print(`Polling telemetry on channel ${channel}...`);
-    return "OK";
+    return `telemetry-stream-${channel}`;
 }
 ```
 
 ### 2.4 Control Flow
 ```verb
-# If / Elif / Else
-if (score > 90) {
-    print("Grade: A");
-} elif (score > 75) {
-    print("Grade: B");
+# Conditionals
+if (threshold > 100) {
+    print("Warning: High load");
+} elif (threshold > 50) {
+    print("Status: Moderate");
 } else {
-    print("Grade: C");
+    print("Status: Normal");
 }
 
-# While loop
-while (count > 0) {
-    count -= 1;
+# Iteration
+while (retries > 0) {
+    retries -= 1;
 }
 
-# For-In loop (Pythonic iteration)
-for item in items {
-    print("Item:", item);
+for item in queue {
+    process(item);
 }
 
-for i in range(5) {
+for i in range(0, 10, 2) {
     print("Index:", i);
 }
 
-# Pattern Matching (match statement)
+# Pattern Matching
 match status_code {
-    200 => print("HTTP 200: OK")
-    404 => print("HTTP 404: Not Found")
-    500 => print("HTTP 500: Server Error")
-    _   => print(`Unknown Status: ${status_code}`)
+    200 => print("OK")
+    404 => print("Not Found")
+    500 => print("Internal Server Error")
+    _   => print("Unknown status:", status_code)
 }
 ```
 
-### 2.5 Pythonic Data Structures, Slices & Comprehensions
+### 2.5 Collections & Comprehensions
 ```verb
-# Lists and Dictionaries
 let numbers = [10, 20, 30, 40, 50, 60];
-let user = {
-    "name": "KiyokoDev",
-    "org": "Verbund Labs",
-    "role": "Architect"
+let config = {
+    "host": "localhost",
+    "port": 9000,
+    "ssl": true
 };
 
-# Slicing: arr[start:end] or arr[start:end:step]
+# Slicing
 let subset = numbers[1:4]; # [20, 30, 40]
 
-# List Comprehensions: [expr for var in iterable (if condition)?]
-let squares = [x * x for x in numbers if x > 25];
+# List Comprehensions: [expression for variable in iterable (if condition)?]
+let filtered = [x * 2 for x in numbers if x > 25];
 ```
 
-### 2.6 Template Literals
+### 2.6 Module System & Imports
 ```verb
-let app_name = "VerbLang Engine";
-let latency = 0.42;
-print(`System ${app_name} running at ${latency} ms latency.`);
+# Import other VerbLang files relative to current file or working directory
+import "math_utils.verb";
+import "./components/layout.verb";
 ```
 
-### 2.7 First-Class HTML Markup & CSS Styling
+### 2.7 Virtual DOM & CSS Styles
 ```verb
-# CSS Rule Declarations (supports .class, #id, tag, and kebab-case properties)
-style .card {
+# CSS Rule Declarations
+style .container {
     color: "cyan";
-    border: "1px solid #ffffff";
+    border: "1px solid #45475a";
     font-weight: "bold";
 }
 
@@ -147,38 +145,35 @@ style .title {
 
 style button {
     color: "green";
-    font-weight: "bold";
 }
 
-# HTML Virtual DOM Elements (first-class AST expressions)
-let dashboard = <div class="card" id="main-panel">
-    <h1 class="title">"Verbund Labs Control Center"</h1>
-    <p>`Nominal metrics: ${len(numbers)} nodes`</p>
-    <button>"Run Hardware Benchmark"</button>
+# First-class Virtual DOM AST
+let panel = <div class="container" id="main-panel">
+    <h1 class="title">"System Overview"</h1>
+    <p>`Active workers: ${len(numbers)}`</p>
+    <button>"Run Diagnostics"</button>
 </div>;
 
 # Render targets:
-let html_output = render_html(dashboard); # Standard HTML5 markup
-let tui_output = render_tui(dashboard);   # Styled ANSI Terminal UI
-print(tui_output);
+let html = render_html(panel); # Standard HTML5 string
+let tui = render_tui(panel);   # ANSI terminal UI with cascaded styles
 ```
 
-### 2.8 C++ Capabilities, Direct Pointers & Defer
+### 2.8 Low-Level Memory & Native C++ Blocks
 ```verb
-# Direct heap allocation and raw pointer access
-let ptr = alloc(64); # Allocate 64 bytes
+# Raw heap memory allocation
+let buffer = alloc(128);
 
 # Deterministic RAII cleanup
 defer {
-    print("Releasing raw pointer buffer!");
-    free(ptr);
+    free(buffer);
 }
 
-# Raw 64-bit integer peek & poke
-poke64(ptr, 0xCAFEBABE1234);
-let read_back = peek64(ptr);
+# Direct 64-bit memory reads and writes
+poke64(buffer, 0x123456789ABCDEF0);
+let val = peek64(buffer);
 
-# Embedded Native C++ Blocks
+# Embedded native C++ block
 native cxx {
     #include <chrono>
     inline uint64_t get_host_nanos() {
@@ -189,78 +184,113 @@ native cxx {
 
 ---
 
-## 3. Standard Library Builtins Reference
+## 3. Standard Library Reference
 
-| Function | Signature | Description |
-|---|---|---|
-| `print(...)` | `print(...values)` | Prints arguments space-separated with a newline. |
-| `len(val)` | `len(collection): int` | Returns length of string, list, or dictionary. |
-| `range(...)` | `range([start], stop, [step]): list` | Generates integer sequence list. |
-| `type(val)` | `type(value): str` | Returns runtime type name (`"int"`, `"float"`, `"string"`, `"list"`, `"dict"`, `"node"`, `"pointer"`). |
-| `now_ns()` | `now_ns(): int` | High-precision nanosecond timestamp. |
-| `now_ms()` | `now_ms(): int` | Millisecond timestamp. |
-| `sleep(ms)` | `sleep(milliseconds)` | Pauses execution for given milliseconds. |
-| `alloc(bytes)` | `alloc(bytes: int): pointer` | Allocates raw heap memory. |
-| `free(ptr)` | `free(pointer)` | Deallocates raw memory. |
-| `poke64(ptr, val)` | `poke64(ptr, value: int)` | Writes 64-bit integer to address. |
-| `peek64(ptr)` | `peek64(ptr): int` | Reads 64-bit integer from address. |
-| `json_stringify(val)` | `json_stringify(value): str` | Serializes value to JSON string. |
-| `json_parse(str)` | `json_parse(json_str: str): Value` | Deserializes JSON string into VerbLang value. |
-| `str_upper(s)` | `str_upper(s: str): str` | Uppercases string. |
-| `str_lower(s)` | `str_lower(s: str): str` | Lowercases string. |
-| `str_trim(s)` | `str_trim(s: str): str` | Strips leading/trailing whitespace. |
-| `str_split(s, sep)` | `str_split(s: str, sep: str): list` | Splits string by delimiter. |
-| `str_join(list, sep)`| `str_join(list, sep: str): str` | Joins list of strings by delimiter. |
-| `str_contains(s, sub)`| `str_contains(s: str, sub: str): bool`| Tests if substring is present. |
-| `list_push(l, val)` | `list_push(list, value)` | Appends item to list. |
-| `list_pop(l)` | `list_pop(list): Value` | Removes and returns last item of list. |
-| `list_reverse(l)` | `list_reverse(list): list` | Returns reversed list. |
-| `list_sort(l)` | `list_sort(list): list` | Returns sorted list. |
-| `create_signal(init)`| `create_signal(initial_val): dict`| Creates reactive signal `{ "get", "set", "subscribe" }`. |
-| `render_html(node)` | `render_html(node): str` | Generates HTML5 string from virtual DOM node. |
-| `render_tui(node)` | `render_tui(node): str` | Computes cascading CSS styles and renders ANSI terminal UI. |
+### Core & I/O
+- `print(...args)`: Write space-separated values to stdout with a newline.
+- `len(val)`: Returns integer length of string, list, or dict.
+- `range(stop)` or `range(start, stop, [step])`: Generates list of integers.
+- `type(val)`: Returns type name string (`"int"`, `"float"`, `"string"`, `"list"`, `"dict"`, `"pointer"`, `"node"`, `"nil"`).
+- `args()`: Returns list of command-line arguments passed to the program.
+- `read_file(path)`: Reads entire file as string.
+- `write_file(path, content)`: Writes string to file. Returns boolean.
+- `file_exists(path)`: Returns true if file exists.
+- `file_remove(path)`: Deletes file from filesystem.
+- `exec(cmd)`: Executes system command and returns stdout as string.
+- `env_get(key)`: Gets environment variable value.
+- `env_set(key, val)`: Sets environment variable.
+- `assert(condition, [msg])`: Aborts execution with error message if condition evaluates to false.
+
+### Time & Control
+- `now_ns()`: High-resolution timestamp in nanoseconds.
+- `now_ms()`: Millisecond timestamp.
+- `sleep(ms)`: Pauses execution thread for specified milliseconds.
+
+### Memory & Low-Level
+- `alloc(bytes)`: Allocates raw memory pointer.
+- `free(ptr)`: Deallocates memory pointer.
+- `peek64(ptr)`: Reads 64-bit integer from pointer.
+- `poke64(ptr, value)`: Writes 64-bit integer to pointer.
+
+### Math
+- `abs(n)`: Absolute value of number.
+- `min(...args)`: Smallest value in arguments.
+- `max(...args)`: Largest value in arguments.
+- `floor(n)`: Floor of float value.
+- `ceil(n)`: Ceiling of float value.
+- `round(n)`: Rounds float value to nearest integer.
+- `sqrt(n)`: Square root.
+- `pow(base, exp)`: Power calculation.
+- `sin(rad)` / `cos(rad)`: Trigonometric functions.
+
+### String & List Utilities
+- `str_upper(s)` / `str_lower(s)`: Convert string case.
+- `str_trim(s)`: Strip leading and trailing whitespace.
+- `str_split(s, delim)`: Split string into list.
+- `str_join(list, delim)`: Join list into string.
+- `str_contains(s, substr)`: Check substring presence.
+- `str_starts_with(s, prefix)`: Test string prefix.
+- `str_ends_with(s, suffix)`: Test string suffix.
+- `str_replace(s, target, repl)`: Replace substring occurrences.
+- `list_push(list, val)`: Append value to list.
+- `list_pop(list)`: Remove and return last element.
+- `list_reverse(list)`: Reverse list copy.
+- `list_sort(list)`: Sort list copy.
+- `list_contains(list, item)`: Test list membership.
+- `list_slice(list, start, end)`: Extract list slice.
+
+### Data Interchange & Reactivity
+- `json_stringify(val)`: Serialize value to JSON string.
+- `json_parse(str)`: Parse JSON string into value.
+- `create_signal(initial)`: Creates reactive signal `{ "get", "set", "subscribe" }`.
+- `render_html(node)`: Serialize virtual DOM node to HTML5 string.
+- `render_tui(node)`: Render virtual DOM node to ANSI terminal UI with cascaded styles.
 
 ---
 
-## 4. CLI Workflow & Toolchain (`verbc`)
+## 4. Compiler CLI (`verbc`)
 
 ```bash
-# Run a script directly
+# Run source file directly
 verbc run <file.verb> [args...]
 
-# Compile to standalone native binary with Clang++ -O3
+# Compile to standalone native binary
 verbc compile <file.verb> -o <binary_name>
 
-# Transpile to inspect generated C++20 code
+# Syntax and type check without compiling
+verbc check <file.verb>
+
+# Discover and run tests
+verbc test [directory]
+
+# Transpile to modern C++20 code
 verbc emit-cxx <file.verb> -o output.cpp
 
-# Scaffold a new Verb project with manifest and agent instructions
+# Scaffold a new VerbLang project
 verbc new <project_name>
 
-# Format and beautify .verb source files
+# Format source file
 verbc fmt <file.verb>
 
-# Interactive REPL
+# Start interactive REPL
 verbc repl
 
-# Version & author info
+# Print version and target info
 verbc version
 ```
 
 ---
 
-## 5. Guidelines for AI Agents Working on VerbLang
+## 5. Engineering Standards
 
-1. **Maintain File Extension**: Always create `.verb` files for VerbLang source code.
-2. **Deterministic Cleanup**: Whenever calling `alloc()`, always pair with a `defer { free(ptr); }` block.
-3. **No Hex Suffixes**: Write hexadecimal literals as `0x1234ABCD` directly; do NOT append `LL` or `ULL` (VerbLang integers are 64-bit natively).
-4. **HTML Expressions**: Write HTML tags directly as AST expressions without enclosing them in strings or quotes.
-5. **CSS Selectors**: Use `style .class-name { prop: "val"; }` or `style tag { ... }`.
-6. **Reactive State**: Prefer `create_signal(initial)` when managing state across UI components or asynchronous event listeners.
-7. **Verification**: Always run `verbc run <file.verb>` or `make test` to verify syntax and execution before finishing tasks.
+1. Use `.verb` extension for all source files.
+2. Pair every `alloc()` call with a `defer { free(ptr); }` block for deterministic RAII cleanup.
+3. Write hexadecimal integer literals without suffix (`0xCAFEBABE1234`), as VerbLang natively operates on 64-bit integers.
+4. Express HTML markup directly as AST nodes without string escaping.
+5. Verify changes with `verbc check <file.verb>`, `verbc test`, or `make test`.
 
 ---
-© 2026 Verbund Labs.
+Copyright (c) 2026 Verbund Labs.
 )AGENTS_GUIDE";
 
 } // namespace verb

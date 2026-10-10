@@ -1,0 +1,4 @@
+import "./math_helper.verb";
+
+let product = helper_multiply(6, 7);
+assert(product == 42, "helper_multiply must equal 42");

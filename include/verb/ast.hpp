@@ -235,6 +235,12 @@ struct StyleDeclStmt : public Stmt {
     void accept(ASTVisitor* visitor) override;
 };
 
+struct ImportStmt : public Stmt {
+    std::string path;
+    explicit ImportStmt(std::string p) : path(std::move(p)) {}
+    void accept(ASTVisitor* visitor) override;
+};
+
 struct Program : public ASTNode {
     std::vector<std::shared_ptr<Stmt>> statements;
     void accept(ASTVisitor* visitor) override;
@@ -276,6 +282,7 @@ public:
     virtual void visit(MatchStmt* node) = 0;
     virtual void visit(NativeCxxStmt* node) = 0;
     virtual void visit(StyleDeclStmt* node) = 0;
+    virtual void visit(ImportStmt* node) = 0;
     virtual void visit(Program* node) = 0;
 };
 

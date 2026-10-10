@@ -22,6 +22,8 @@ $(TARGET): $(OBJS) ../verb-runtime/libverbrt.a
 
 test: all
 	@echo "Running VerbLang Test Suite..."
+	./bin/verbc test tests
+	@echo "\nRunning Showcase Programs..."
 	./bin/verbc run examples/01_hello_world.verb
 	./bin/verbc run examples/02_pythonic_data.verb
 	./bin/verbc run examples/03_js_async_lambdas.verb
