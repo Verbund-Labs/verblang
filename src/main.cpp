@@ -1,6 +1,7 @@
 #include "verb/lexer.hpp"
 #include "verb/parser.hpp"
 #include "verb/codegen_cxx.hpp"
+#include "verb/agents_guide.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -260,8 +261,13 @@ int cmd_new(const std::string& project_name) {
            << "```\n";
     readme.close();
 
+    std::ofstream agents_file(root / "AGENTS.md");
+    agents_file << verb::AGENTS_GUIDE_TEMPLATE;
+    agents_file.close();
+
     std::cout << "\033[1;32m✓ Created new VerbLang project:\033[0m " << project_name << "\n";
     std::cout << "  Entry point: \033[1;36m" << project_name << "/src/main.verb\033[0m\n";
+    std::cout << "  Agent guide: \033[1;35m" << project_name << "/AGENTS.md\033[0m\n";
     std::cout << "  Run command: \033[1;33mverbc run " << project_name << "/src/main.verb\033[0m\n";
     return 0;
 }
