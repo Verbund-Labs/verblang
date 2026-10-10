@@ -1,0 +1,38 @@
+# ==========================================
+# VerbLang - Pythonic Data Structures & Slices
+# Developed by Verbund Labs
+# ==========================================
+
+print("=== Pythonic Slices & Comprehensions in VerbLang ===")
+
+# Numbers list
+let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+print("Original numbers:", numbers);
+
+# Slicing
+let slice_mid = numbers[2:7];
+print("Slice [2:7]:", slice_mid);
+
+# List Comprehension
+let evens_squared = [x * x for x in numbers if x % 2 == 0];
+print("Evens squared comprehension:", evens_squared);
+
+# Dictionaries
+let config = {
+    "language": "VerbLang",
+    "organization": "Verbund Labs",
+    "speed": "Native C++20",
+    "syntax": "Python + JS + HTML + CSS"
+};
+
+print("Config object:", config);
+print("Language name:", config["language"]);
+print("Speed level:", config["speed"]);
+
+# Range loop
+print("Looping through range(0, 5):");
+for i in range(5) {
+    print("  Index:", i);
+}
+
+print("Total elements in numbers:", len(numbers));

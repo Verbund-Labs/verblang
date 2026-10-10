@@ -1,0 +1,37 @@
+# ==========================================
+# VerbLang - HTML & CSS First-Class Components
+# Developed by Verbund Labs
+# ==========================================
+
+print("=== First-Class HTML & CSS Engine in VerbLang ===");
+
+# CSS Stylesheet definition directly in VerbLang code!
+style .dashboard {
+    color: "cyan";
+    border: "1px solid #ffffff";
+}
+
+style .title {
+    color: "magenta";
+    font-weight: "bold";
+}
+
+style button {
+    color: "green";
+    font-weight: "bold";
+}
+
+# HTML Markup directly in VerbLang syntax!
+let component = <div class="dashboard" id="main-panel">
+    <h1 class="title">"VerbLang Component Engine"</h1>
+    <p>"Designed by Verbund Labs: C++ speed meets web ease."</p>
+    <button>"Click to Deploy Native Binary"</button>
+</div>;
+
+print("\n--- 1. Generated HTML5 Markup ---");
+let html_str = render_html(component);
+print(html_str);
+
+print("--- 2. Rendered Terminal ANSI UI with Cascaded CSS ---");
+let tui_str = render_tui(component);
+print(tui_str);

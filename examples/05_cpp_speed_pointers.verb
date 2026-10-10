@@ -1,0 +1,71 @@
+# ==========================================
+# VerbLang - Raw C++ Speed & Pointer Capabilities
+# Developed by Verbund Labs
+# ==========================================
+
+print("=== C++ Capabilities: Direct Pointers & Native Blocks ===");
+
+# Direct C++ Embedded Code block
+native cxx {
+    #include <chrono>
+    inline uint64_t compute_collatz_max_steps(uint64_t limit) {
+        uint64_t max_steps = 0;
+        for (uint64_t i = 1; i <= limit; ++i) {
+            uint64_t n = i;
+            uint64_t steps = 0;
+            while (n > 1) {
+                if (n % 2 == 0) n /= 2;
+                else n = 3 * n + 1;
+                steps++;
+            }
+            if (steps > max_steps) max_steps = steps;
+        }
+        return max_steps;
+    }
+}
+
+# 1. Direct Memory Manipulation & RAII Defer
+fn test_raw_pointers() {
+    print("\n--- 1. Testing Raw Pointer & Memory Allocation ---");
+    let ptr = alloc(64);
+    print("Allocated raw memory buffer pointer:", ptr);
+
+    # Ensure memory is freed even if exceptions or returns happen
+    defer {
+        print("RAII defer: Cleaning up raw pointer buffer!");
+        free(ptr);
+    }
+
+    # Poke 64-bit integer into memory address
+    let test_value = 0xCAFEBABE1234;
+    poke64(ptr, test_value);
+
+    # Peek 64-bit integer from memory address
+    let read_back = peek64(ptr);
+    print("Poked value: 0xCAFEBABE1234");
+    print("Peeked value:", read_back);
+
+    if (test_value == read_back) {
+        print("✓ Memory integrity verified with zero overhead!");
+    }
+}
+
+test_raw_pointers();
+
+# 2. Performance Benchmark at Native C++ Speed
+print("\n--- 2. High-Performance Native Speed Benchmark ---");
+let t0 = now_ns();
+
+# Run 500,000 iterations in pure native C++ speed
+let iters = 500000;
+let total = 0;
+for i in range(iters) {
+    total += i % 7;
+}
+
+let t1 = now_ns();
+let elapsed_ms = (t1 - t0) / 1000000.0;
+
+print(`Processed ${iters} operations in ${elapsed_ms} ms!`);
+print(`Throughput: ${(iters / elapsed_ms) * 1000.0} ops/sec`);
+print("VerbLang delivers raw C++ throughput with elegant syntax!");

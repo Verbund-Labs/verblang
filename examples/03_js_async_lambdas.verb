@@ -1,0 +1,30 @@
+# ==========================================
+# VerbLang - JavaScript-style Lambdas & Closures
+# Developed by Verbund Labs
+# ==========================================
+
+print("=== JavaScript-style Arrow Functions & Closures ===")
+
+# Arrow functions
+let add = (a, b) => a + b;
+let square = x => x * x;
+
+print("add(15, 27) =", add(15, 27));
+print("square(9) =", square(9));
+
+# Higher order functions / closures
+fn create_adder(base) {
+    return x => x + base;
+}
+
+let add100 = create_adder(100);
+print("add100(42) =", add100(42));
+
+# Async function demonstration
+async fn compute_async_payload(task_name) {
+    print(`Executing async task: ${task_name}...`);
+    return `Task ${task_name} finished with 0 errors!`;
+}
+
+let status = compute_async_payload("Verbund-Data-Pipeline");
+print("Async status:", status);

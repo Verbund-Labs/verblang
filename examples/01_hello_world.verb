@@ -1,0 +1,17 @@
+# ==========================================
+# VerbLang - Hello World Showcase
+# Developed by Verbund Labs
+# ==========================================
+
+fn greet(name) {
+    let message = `Hello, ${name}! Welcome to VerbLang.`;
+    return message;
+}
+
+// Top level execution
+let target = "World";
+let welcome = greet(target);
+print(welcome);
+
+let author = "Verbund Labs";
+print(`Created with love and raw C++ power by ${author}!`);
